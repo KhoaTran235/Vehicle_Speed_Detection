@@ -9,7 +9,8 @@ The system is designed to:
 - Estimate vehicle speed using **perspective (homography) transformation**
 - Save the annotated result as an MP4 video
 
-<video src="outputs/vehicles_result.mp4" controls width="800"></video>
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=r839jl9Ub2M" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ---
 
 ## Features
