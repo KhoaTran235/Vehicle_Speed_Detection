@@ -11,6 +11,8 @@ The system is designed to:
 
 [![Vehicle Detection & Speed Estimation Demo](https://img.youtube.com/vi/r839jl9Ub2M/0.jpg)](https://youtu.be/r839jl9Ub2M)
 
+**YouTube Demo**: https://youtu.be/r839jl9Ub2M
+
 ---
 
 ## Features
