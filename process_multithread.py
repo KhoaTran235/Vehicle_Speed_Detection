@@ -29,7 +29,7 @@ text_scale = sv.calculate_optimal_text_scale(resolution_wh=video_info.resolution
 # TRACKER = Sort()
 TRACKER = sv.ByteTrack(frame_rate=video_info.fps, track_activation_threshold=0.3)
 
-BOX_ANNOTATOR = sv.BoxCornerAnnotator(thickness=thickness)
+BOX_ANNOTATOR = sv.BoxAnnotator(thickness=thickness)
 LABEL_ANNOTATOR = sv.LabelAnnotator(
         text_scale=text_scale,
         text_thickness=thickness,
@@ -38,7 +38,7 @@ LABEL_ANNOTATOR = sv.LabelAnnotator(
 TRACE_ANNOTATOR = sv.TraceAnnotator(
         thickness=thickness,
         trace_length=video_info.fps * 2,
-        position=sv.Position.BOTTOM_CENTER,
+        position=sv.Position.CENTER,
     )
 
 SOURCE = np.array([[1252, 787], [2298, 803], [5039, 2159], [-550, 2159]])
@@ -54,6 +54,23 @@ TARGET = np.array(
     ]
 )
 
+detection_zone = sv.PolygonZone(polygon=SOURCE)
+view_transformer = ViewTransformer(source=SOURCE, target=TARGET)
+
+coordinates = defaultdict(lambda: deque(maxlen=video_info.fps))
+
+START = sv.Point(0, 1500)
+END = sv.Point(3840, 1500)
+
+LINE_COUNTER = sv.LineZone(start=START, end=END)
+
+LINE_COUNTER_ANNOTATOR = sv.LineZoneAnnotator(
+    thickness=4,
+    text_thickness=4,
+    text_scale=2)
+
+
+
 DISPLAY_SIZE = (1200, 600)
 video_writer = VideoWriterMP4(
     output_path=OUTPUT_VIDEO,
@@ -65,10 +82,9 @@ cap = cv2.VideoCapture(VIDEO_PATH)
 
 vehicle_classes = [2, 3, 5, 7]  # car, motorcycle, bus, truck
     
-detection_zone = sv.PolygonZone(polygon=SOURCE)
-view_transformer = ViewTransformer(source=SOURCE, target=TARGET)
 
-coordinates = defaultdict(lambda: deque(maxlen=video_info.fps))
+
+
 
 start_time = start_time_ = time.time()
 frame_count = frame_count_ = 0
@@ -154,7 +170,7 @@ def display_worker(result_queue, tracker, stop_event, video_writer):
 
 
         points = vehicle_detections.get_anchors_coordinates(
-                anchor=sv.Position.BOTTOM_CENTER
+                anchor=sv.Position.CENTER
             )
         points = view_transformer.transform_points(points=points).astype(int)
 
@@ -175,10 +191,12 @@ def display_worker(result_queue, tracker, stop_event, video_writer):
                 speed = distance / time_ * 3.6
                 labels.append(f"#{tracker_id} {int(speed)} km/h")
 
+        LINE_COUNTER.trigger(vehicle_detections)
 
         annotated = TRACE_ANNOTATOR.annotate(image.copy(), vehicle_detections)
         annotated = BOX_ANNOTATOR.annotate(annotated, vehicle_detections)
         annotated = LABEL_ANNOTATOR.annotate(annotated, vehicle_detections, labels=labels)
+        annotated = LINE_COUNTER_ANNOTATOR.annotate(annotated, line_counter=LINE_COUNTER)
 
         annotated = sv.draw_polygon(annotated, polygon=SOURCE, color=sv.Color.RED, thickness=thickness)
 

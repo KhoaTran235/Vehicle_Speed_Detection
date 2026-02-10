@@ -3,7 +3,7 @@
 This repository implements a **real-time vehicle detection, tracking, and speed estimation system**
 using **YOLOv8 optimized with TensorRT**, combined with a **multithreaded pipeline** for high FPS video processing.
 
-The system is designed to:
+Features:
 - Run **YOLOv8** inference for vehicles detection in a separate thread
 - Track vehicles with **ByteTrack**
 - Estimate vehicle speed using **perspective (homography) transformation**

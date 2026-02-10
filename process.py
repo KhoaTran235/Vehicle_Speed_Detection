@@ -11,7 +11,7 @@ from view_transform import ViewTransformer
 
 
 
-YOLO_MODEL = YOLO("models/pruned_yolov8n.engine", task="detect")
+YOLO_MODEL = YOLO("models/yolo26n.pt", task="detect")
 VIDEO_PATH = "data/vehicles.mp4"
 
 # Video info
